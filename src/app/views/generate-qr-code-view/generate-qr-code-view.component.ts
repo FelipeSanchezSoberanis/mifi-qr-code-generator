@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import Swal from "sweetalert2";
@@ -17,22 +17,9 @@ interface QrCodeData {
   templateUrl: "./generate-qr-code-view.component.html",
   styleUrls: ["./generate-qr-code-view.component.scss"]
 })
-export class GenerateQrCodeViewComponent implements OnInit {
+export class GenerateQrCodeViewComponent {
   qrCodeDataString: string | null = null;
   qrCodeUrl: SafeUrl | null = null;
-
-  ngOnInit(): void {
-    this.qrCodeDataForm.patchValue({
-      career: "Ingeniería civil",
-      email: "a@a",
-      enrollmentId: 18214854,
-      name: "Felipe Sánchez Soberanis",
-      phoneNumber: null,
-      startingSemester: "Agosto 2023"
-    });
-
-    this.qrCodeDataString = JSON.stringify(this.qrCodeDataForm.value as QrCodeData);
-  }
 
   qrCodeDataForm = new FormGroup({
     name: new FormControl<string>("", Validators.required),
