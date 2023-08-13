@@ -6,10 +6,11 @@ import { AppComponent } from "./app.component";
 import { GenerateQrCodeViewComponent } from "./views/generate-qr-code-view/generate-qr-code-view.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { FormErrorMessageComponent } from "./components/form-error-message/form-error-message.component";
+import { QRCodeModule } from "angularx-qrcode";
 
 @NgModule({
   declarations: [AppComponent, GenerateQrCodeViewComponent, FormErrorMessageComponent],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, QRCodeModule],
   providers: [],
   bootstrap: [AppComponent]
 })

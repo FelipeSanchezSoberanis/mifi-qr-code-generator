@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
-import { FormBuilder, Validators } from "@angular/forms";
+import { Component, OnInit } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { SafeUrl } from "@angular/platform-browser";
 import Swal from "sweetalert2";
 
 interface QrCodeData {
@@ -16,16 +17,37 @@ interface QrCodeData {
   templateUrl: "./generate-qr-code-view.component.html",
   styleUrls: ["./generate-qr-code-view.component.scss"]
 })
-export class GenerateQrCodeViewComponent {
-  constructor(private formBuilder: FormBuilder) {}
+export class GenerateQrCodeViewComponent implements OnInit {
+  qrCodeDataString: string | null = null;
+  qrCodeUrl: SafeUrl | null = null;
 
-  qrCodeDataForm = this.formBuilder.group({
-    name: ["", Validators.required],
-    enrollmentId: [null, [Validators.required, Validators.min(11111111), Validators.max(99999999)]],
-    startingSemester: [null, Validators.required],
-    career: [null, Validators.required],
-    email: ["", [Validators.required, Validators.email]],
-    phoneNumber: [null, [Validators.min(1111111111), Validators.max(9999999999)]]
+  ngOnInit(): void {
+    this.qrCodeDataForm.patchValue({
+      career: "Ingeniería civil",
+      email: "a@a",
+      enrollmentId: 18214854,
+      name: "Felipe Sánchez Soberanis",
+      phoneNumber: null,
+      startingSemester: "Agosto 2023"
+    });
+
+    this.qrCodeDataString = JSON.stringify(this.qrCodeDataForm.value as QrCodeData);
+  }
+
+  qrCodeDataForm = new FormGroup({
+    name: new FormControl<string>("", Validators.required),
+    enrollmentId: new FormControl<number | null>(null, [
+      Validators.required,
+      Validators.min(11111111),
+      Validators.max(99999999)
+    ]),
+    startingSemester: new FormControl<string | null>(null, Validators.required),
+    career: new FormControl<string | null>(null, Validators.required),
+    email: new FormControl<string>("", [Validators.required, Validators.email]),
+    phoneNumber: new FormControl<number | null>(null, [
+      Validators.min(1111111111),
+      Validators.max(9999999999)
+    ])
   });
 
   handleGenerateQrCodeClick() {
@@ -46,6 +68,12 @@ export class GenerateQrCodeViewComponent {
       confirmButtonText: "Obtener código QR",
       showDenyButton: true,
       denyButtonText: "Corregir información"
+    }).then((result) => {
+      if (result.isConfirmed) this.qrCodeDataString = JSON.stringify(qrCodeData);
     });
+  }
+
+  handleQrCodeUrlChange(url: SafeUrl) {
+    this.qrCodeUrl = url;
   }
 }

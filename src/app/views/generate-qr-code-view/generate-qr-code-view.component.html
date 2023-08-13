@@ -1,10 +1,10 @@
 <main class="container pt-3">
-  <h1 class="text-center">Genera tu código QR</h1>
-  <p class="text-center">
+  <h1 *ngIf="!qrCodeDataString" class="text-center">Genera tu código QR</h1>
+  <p *ngIf="!qrCodeDataString" class="text-center">
     No olvides guardar el QR generado con tu información! Ya que será usado para tu pase de lista en
     las actividades de MIFI.
   </p>
-  <form [formGroup]="qrCodeDataForm">
+  <form *ngIf="!qrCodeDataString" [formGroup]="qrCodeDataForm" class="mb-5">
     <div class="mb-3">
       <label class="form-label required-input">Nombre</label>
       <input formControlName="name" type="email" class="form-control" />
@@ -43,7 +43,7 @@
       <input formControlName="phoneNumber" type="number" class="form-control" />
       <form-error-message [control]="qrCodeDataForm.controls.phoneNumber"></form-error-message>
     </div>
-    <div class="mb-3 row justify-content-center">
+    <div *ngIf="!qrCodeDataString" class="mb-3 row justify-content-center">
       <button
         (click)="handleGenerateQrCodeClick()"
         [disabled]="qrCodeDataForm.invalid"
@@ -53,4 +53,20 @@
       </button>
     </div>
   </form>
+
+  <div *ngIf="qrCodeDataString">
+    <h1 class="text-center">Tu código QR para el pase de lista</h1>
+    <qrcode
+      class="text-center"
+      (qrCodeURL)="handleQrCodeUrlChange($event)"
+      [qrdata]="qrCodeDataString"
+      [width]="256"
+      errorCorrectionLevel="L"
+    ></qrcode>
+    <div class="row justify-content-center">
+      <a [href]="qrCodeUrl" download="qr" class="col-auto">
+        <button class="btn btn-primary">Descargar</button>
+      </a>
+    </div>
+  </div>
 </main>
