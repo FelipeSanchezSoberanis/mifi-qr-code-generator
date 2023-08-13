@@ -6,7 +6,7 @@
   </p>
   <form *ngIf="!qrCodeDataString" [formGroup]="qrCodeDataForm" class="mb-5">
     <div class="mb-3">
-      <label class="form-label required-input">Nombre</label>
+      <label class="form-label required-input">Nombre completo</label>
       <input formControlName="name" type="email" class="form-control" />
       <form-error-message [control]="qrCodeDataForm.controls.name"></form-error-message>
     </div>
