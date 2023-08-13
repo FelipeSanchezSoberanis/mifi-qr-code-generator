@@ -7,12 +7,22 @@
   <form *ngIf="!qrCodeDataString" [formGroup]="qrCodeDataForm" class="mb-5">
     <div class="mb-3">
       <label class="form-label required-input">Nombre completo</label>
-      <input formControlName="name" type="email" class="form-control" />
+      <input
+        formControlName="name"
+        type="email"
+        class="form-control"
+        placeholder="José Pedro Sánchez Pedrera"
+      />
       <form-error-message [control]="qrCodeDataForm.controls.name"></form-error-message>
     </div>
     <div class="mb-3">
       <label class="form-label required-input">Matrícula</label>
-      <input formControlName="enrollmentId" type="number" class="form-control" />
+      <input
+        formControlName="enrollmentId"
+        type="number"
+        class="form-control"
+        placeholder="18214854"
+      />
       <form-error-message [control]="qrCodeDataForm.controls.enrollmentId"></form-error-message>
     </div>
     <div class="mb-3">
@@ -35,12 +45,22 @@
     </div>
     <div class="mb-3">
       <label class="form-label required-input">Correo</label>
-      <input formControlName="email" type="email" class="form-control" />
+      <input
+        formControlName="email"
+        type="email"
+        class="form-control"
+        placeholder="correo@ejemplo.com"
+      />
       <form-error-message [control]="qrCodeDataForm.controls.email"></form-error-message>
     </div>
     <div class="mb-3">
       <label class="form-label">Teléfono</label>
-      <input formControlName="phoneNumber" type="number" class="form-control" />
+      <input
+        formControlName="phoneNumber"
+        type="number"
+        class="form-control"
+        placeholder="9991223817"
+      />
       <form-error-message [control]="qrCodeDataForm.controls.phoneNumber"></form-error-message>
     </div>
     <div *ngIf="!qrCodeDataString" class="mb-3 row justify-content-center">
