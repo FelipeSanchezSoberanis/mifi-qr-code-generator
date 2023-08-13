@@ -17,12 +17,20 @@
     </div>
     <div class="mb-3">
       <label class="form-label required-input">Semestre de inicio</label>
-      <input formControlName="startingSemester" type="string" class="form-control" />
+      <select formControlName="startingSemester" class="form-select">
+        <option>Agosto 2023</option>
+        <option>Enero 2024</option>
+      </select>
       <form-error-message [control]="qrCodeDataForm.controls.startingSemester"></form-error-message>
     </div>
     <div class="mb-3">
       <label class="form-label required-input">Carrera</label>
-      <input formControlName="career" type="string" class="form-control" />
+      <select formControlName="career" class="form-select">
+        <option>Ingeniería civil</option>
+        <option>Ingeniería en energías renovables</option>
+        <option>Ingeniería física</option>
+        <option>Ingeniería mecatrónica</option>
+      </select>
       <form-error-message [control]="qrCodeDataForm.controls.career"></form-error-message>
     </div>
     <div class="mb-3">
