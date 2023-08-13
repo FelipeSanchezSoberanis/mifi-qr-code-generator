@@ -1,0 +1,14 @@
+<ng-container *ngIf="control.touched && !control.valid">
+  <div class="form-text text-danger" *ngFor="let validationError of getValidationErrors()">
+    <ng-container [ngSwitch]="validationError.errorType">
+      <ng-container *ngSwitchCase="'required'">Este campo es obligatorio</ng-container>
+      <ng-container *ngSwitchCase="'email'">Este campo tiene que ser un correo valido</ng-container>
+      <ng-container *ngSwitchCase="'min'"
+        >Este campo tiene que ser mayor a {{ validationError.info }}
+      </ng-container>
+      <ng-container *ngSwitchCase="'max'"
+        >Este campo tiene que ser menor a {{ validationError.info }}
+      </ng-container>
+    </ng-container>
+  </div>
+</ng-container>

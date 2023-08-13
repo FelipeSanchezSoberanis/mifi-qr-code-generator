@@ -1,0 +1,48 @@
+<main class="container pt-3">
+  <h1 class="text-center">Genera tu código QR</h1>
+  <p class="text-center">
+    No olvides guardar el QR generado con tu información! Ya que será usado para tu pase de lista en
+    las actividades de MIFI.
+  </p>
+  <form [formGroup]="qrCodeDataForm">
+    <div class="mb-3">
+      <label class="form-label required-input">Nombre</label>
+      <input formControlName="name" type="email" class="form-control" />
+      <form-error-message [control]="qrCodeDataForm.controls.name"></form-error-message>
+    </div>
+    <div class="mb-3">
+      <label class="form-label required-input">Matrícula</label>
+      <input formControlName="enrollmentId" type="number" class="form-control" />
+      <form-error-message [control]="qrCodeDataForm.controls.enrollmentId"></form-error-message>
+    </div>
+    <div class="mb-3">
+      <label class="form-label required-input">Semestre de inicio</label>
+      <input formControlName="startingSemester" type="string" class="form-control" />
+      <form-error-message [control]="qrCodeDataForm.controls.startingSemester"></form-error-message>
+    </div>
+    <div class="mb-3">
+      <label class="form-label required-input">Carrera</label>
+      <input formControlName="career" type="string" class="form-control" />
+      <form-error-message [control]="qrCodeDataForm.controls.career"></form-error-message>
+    </div>
+    <div class="mb-3">
+      <label class="form-label required-input">Correo</label>
+      <input formControlName="email" type="email" class="form-control" />
+      <form-error-message [control]="qrCodeDataForm.controls.email"></form-error-message>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Teléfono</label>
+      <input formControlName="phoneNumber" type="number" class="form-control" />
+      <form-error-message [control]="qrCodeDataForm.controls.phoneNumber"></form-error-message>
+    </div>
+    <div class="mb-3 row justify-content-center">
+      <button
+        (click)="handleGenerateQrCodeClick()"
+        [disabled]="qrCodeDataForm.invalid"
+        class="btn btn-primary col-auto"
+      >
+        Generar código QR
+      </button>
+    </div>
+  </form>
+</main>
