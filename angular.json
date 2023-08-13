@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["sweetalert2"],
+            "allowedCommonJsDependencies": ["sweetalert2", "qrcode"],
             "outputPath": "dist/qr-code-generator",
             "index": "src/index.html",
             "main": "src/main.ts",
