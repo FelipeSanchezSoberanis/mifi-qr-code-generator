@@ -12,3 +12,7 @@ input.ng-touched.ng-invalid:not(form) {
 a {
   text-decoration: none;
 }
+
+main {
+  padding-top: calc(56px + 1rem);
+}

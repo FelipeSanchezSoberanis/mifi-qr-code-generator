@@ -9,6 +9,7 @@ import { FormErrorMessageComponent } from "./components/form-error-message/form-
 import { QRCodeModule } from "angularx-qrcode";
 import { JoinCsvsViewComponent } from "./views/join-csvs-view/join-csvs-view.component";
 import { HomeViewComponent } from "./views/home-view/home-view.component";
+import { NavbarComponent } from "./components/navbar/navbar.component";
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { HomeViewComponent } from "./views/home-view/home-view.component";
     GenerateQrCodeViewComponent,
     FormErrorMessageComponent,
     JoinCsvsViewComponent,
-    HomeViewComponent
+    HomeViewComponent,
+    NavbarComponent
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, QRCodeModule],
   providers: [],
