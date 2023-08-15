@@ -56,7 +56,8 @@ export class GenerateQrCodeViewComponent {
       showDenyButton: true,
       denyButtonText: "Corregir información"
     }).then((result) => {
-      if (result.isConfirmed) this.qrCodeDataString = JSON.stringify(qrCodeData);
+      if (result.isConfirmed)
+        this.qrCodeDataString = `${qrCodeData.name}$${qrCodeData.enrollmentId}$${qrCodeData.startingSemester}$${qrCodeData.email}$${qrCodeData.phoneNumber}`;
     });
   }
 
