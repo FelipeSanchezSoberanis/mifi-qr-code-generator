@@ -20,7 +20,8 @@ export class NavbarComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.routerLinks.forEach((routerLink) => {
       routerLink.nativeElement.addEventListener("click", () => {
-        this.navButton.nativeElement.click();
+        if (this.navButton.nativeElement.getAttribute("aria-expanded") === "true")
+          this.navButton.nativeElement.click();
       });
     });
   }
