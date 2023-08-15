@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import Swal from "sweetalert2";
@@ -17,7 +17,7 @@ interface QrCodeData {
   templateUrl: "./generate-qr-code-view.component.html",
   styleUrls: ["./generate-qr-code-view.component.scss"]
 })
-export class GenerateQrCodeViewComponent {
+export class GenerateQrCodeViewComponent implements OnInit {
   qrCodeDataString: string | null = null;
   qrCodeUrl: SafeUrl | null = null;
 
@@ -37,6 +37,25 @@ export class GenerateQrCodeViewComponent {
     ])
   });
 
+  ngOnInit(): void {
+    this.qrCodeDataForm.controls.startingSemester.valueChanges.subscribe((startingSemester) => {
+      if (startingSemester === "Enero 2024") {
+        this.qrCodeDataForm.controls.enrollmentId.setValidators([
+          Validators.min(11111111),
+          Validators.max(99999999)
+        ]);
+      } else {
+        this.qrCodeDataForm.controls.enrollmentId.setValidators([
+          Validators.required,
+          Validators.min(11111111),
+          Validators.max(99999999)
+        ]);
+      }
+
+      this.qrCodeDataForm.controls.enrollmentId.updateValueAndValidity();
+    });
+  }
+
   handleGenerateQrCodeClick() {
     const qrCodeData = this.qrCodeDataForm.value as QrCodeData;
 
@@ -45,7 +64,7 @@ export class GenerateQrCodeViewComponent {
       title: "Por favor, revisa tu información antes de continuar",
       html: `
         Nombre: ${qrCodeData.name} <br>
-        Matrícula: ${qrCodeData.enrollmentId} <br>
+        Matrícula: ${qrCodeData.enrollmentId ? qrCodeData.enrollmentId : "No indicado"} <br>
         Semestre de inicio: ${qrCodeData.startingSemester} <br>
         Carrera: ${qrCodeData.career} <br>
         Correo: ${qrCodeData.email} <br>
@@ -63,5 +82,9 @@ export class GenerateQrCodeViewComponent {
 
   handleQrCodeUrlChange(url: SafeUrl) {
     this.qrCodeUrl = url;
+  }
+
+  enrollmentIdIsRequired(): boolean {
+    return this.qrCodeDataForm.controls.enrollmentId.hasValidator(Validators.required);
   }
 }

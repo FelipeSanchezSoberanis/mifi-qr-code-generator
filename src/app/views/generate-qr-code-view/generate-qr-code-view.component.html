@@ -16,7 +16,17 @@
       <form-error-message [control]="qrCodeDataForm.controls.name"></form-error-message>
     </div>
     <div class="mb-3">
-      <label class="form-label required-input">Matrícula</label>
+      <label class="form-label required-input">Semestre de inicio</label>
+      <select formControlName="startingSemester" class="form-select">
+        <option>Agosto 2023</option>
+        <option>Enero 2024</option>
+      </select>
+      <form-error-message [control]="qrCodeDataForm.controls.startingSemester"></form-error-message>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" [class]="{ 'required-input': enrollmentIdIsRequired() }">
+        Matrícula</label
+      >
       <input
         formControlName="enrollmentId"
         type="number"
@@ -24,14 +34,6 @@
         placeholder="18214854"
       />
       <form-error-message [control]="qrCodeDataForm.controls.enrollmentId"></form-error-message>
-    </div>
-    <div class="mb-3">
-      <label class="form-label required-input">Semestre de inicio</label>
-      <select formControlName="startingSemester" class="form-select">
-        <option>Agosto 2023</option>
-        <option>Enero 2024</option>
-      </select>
-      <form-error-message [control]="qrCodeDataForm.controls.startingSemester"></form-error-message>
     </div>
     <div class="mb-3">
       <label class="form-label required-input">Carrera</label>
