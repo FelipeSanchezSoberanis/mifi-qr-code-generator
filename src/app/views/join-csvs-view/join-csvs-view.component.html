@@ -1,0 +1,23 @@
+<main class="container pt-3">
+  <div class="mb-3 text-center">
+    <h1>Une diferentes archivos CSVs en uno solo</h1>
+    <p>
+      Selecciona diferentes archivos CSVs que contengan las mismas columnas para obtener un archivo
+      CSV final que una la información de cada uno
+    </p>
+  </div>
+  <div class="mb-3">
+    <input
+      (change)="handleUploadedFilesChanged($event)"
+      class="form-control"
+      type="file"
+      multiple
+      accept=".csv"
+    />
+  </div>
+  <div *ngIf="downloadString" class="mb-3 row justify-content-center">
+    <a [href]="downloadString" download="csvs-unidos" class="col-auto">
+      <button class="btn btn-primary">Descargar</button>
+    </a>
+  </div>
+</main>
