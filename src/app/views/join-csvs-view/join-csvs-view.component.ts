@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import * as Papa from "papaparse";
 
 @Component({
   selector: "app-join-csvs-view",
@@ -19,18 +20,14 @@ export class JoinCsvsViewComponent {
 
     if (!files.length) return;
 
-    const fileContents: string[] = [];
-
-    let i = 0;
+    const csvContents: any[] = [];
     for (let file of files) {
-      const content = await file.text();
-      const lines = content.split(/\r?\n/);
-      if (i === 0) fileContents.push(lines[0] + "\n");
-      fileContents.push(lines.slice(1, lines.length).join("\n"));
-      i++;
+      Papa.parse(await file.text(), { header: true }).data.forEach((content) => {
+        csvContents.push(content);
+      });
     }
 
-    const newFile = new Blob(fileContents, { type: "text/csv" });
+    const newFile = new Blob([Papa.unparse(csvContents)], { type: "text/csv" });
     this.downloadString = URL.createObjectURL(newFile);
   }
 }
