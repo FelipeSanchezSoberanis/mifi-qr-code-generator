@@ -97,6 +97,8 @@
   </ng-container>
   <ng-container *ngIf="!authenticatedWithTeams">
     <h1 class="text-center">Entra con tu correo institucional</h1>
-    <button (click)="getMicrosoftTeamsLoginPage()">Log in</button>
+    <button class="position-absolute top-50 start-50" (click)="getMicrosoftTeamsLoginPage()">
+      Log in
+    </button>
   </ng-container>
 </main>
