@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Params, Router } from "@angular/router";
 import { filter, mergeMap } from "rxjs";
-import { TeamsService } from "src/app/api/teams.service";
+import { TeamsService, TeamsUserInfo } from "src/app/api/teams.service";
 import Swal from "sweetalert2";
 
 interface QrCodeData {
@@ -64,15 +64,7 @@ export class GenerateQrCodeViewComponent {
     return /^a\d{8}@alumnos\.uady\.mx$/i.test(email);
   }
 
-  setFormDataFromTeamsInfo({
-    displayName,
-    id,
-    mail
-  }: {
-    displayName?: string;
-    id?: string;
-    mail?: string;
-  }) {
+  setFormDataFromTeamsInfo({ displayName, mail }: TeamsUserInfo) {
     if (mail) {
       this.qrCodeDataForm.patchValue({ email: mail });
       this.qrCodeDataForm.get("email")?.disable();

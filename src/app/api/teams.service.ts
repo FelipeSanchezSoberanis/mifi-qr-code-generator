@@ -10,10 +10,18 @@ type AccessTokenRequestResponse = {
   token_type: string;
 };
 
+export type TeamsUserInfo = {
+  displayName?: string;
+  id?: string;
+  mail?: string;
+};
+
 @Injectable({
   providedIn: "root"
 })
 export class TeamsService {
+  private redirectUri = "http://localhost:4200/generate-qr-code";
+
   constructor(private httpClient: HttpClient) {}
 
   async getTeamsLoginPage(): Promise<{ codeVerifier: string; loginUrl: string }> {
@@ -23,7 +31,7 @@ export class TeamsService {
       {
         client_id: "7ae052f5-54fa-4323-840e-f39d141c87a6",
         response_type: "code",
-        redirect_uri: "http://localhost:4200/generate-qr-code",
+        redirect_uri: this.redirectUri,
         response_mode: "query",
         scope: "User.Read",
         state: "12345",
@@ -40,7 +48,7 @@ export class TeamsService {
       .set("client_id", "7ae052f5-54fa-4323-840e-f39d141c87a6")
       .set("scope", "User.Read")
       .set("code", code)
-      .set("redirect_uri", "http://localhost:4200/generate-qr-code")
+      .set("redirect_uri", this.redirectUri)
       .set("grant_type", "authorization_code")
       .set("code_verifier", codeVerifier);
 
@@ -52,11 +60,7 @@ export class TeamsService {
   }
 
   getLoggedInUserInfo(accessToken: string) {
-    return this.httpClient.get<{
-      displayName?: string;
-      id?: string;
-      mail?: string;
-    }>("https://graph.microsoft.com/v1.0/me", {
+    return this.httpClient.get<TeamsUserInfo>("https://graph.microsoft.com/v1.0/me", {
       headers: { authorization: `Bearer ${accessToken}` }
     });
   }
