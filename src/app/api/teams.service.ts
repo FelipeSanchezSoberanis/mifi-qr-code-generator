@@ -20,7 +20,7 @@ export type TeamsUserInfo = {
   providedIn: "root"
 })
 export class TeamsService {
-  private redirectUri = "https://main--effervescent-kataifi-334518.netlify.app/generate-qr-code";
+  private redirectUri = "https://effervescent-kataifi-334518.netlify.app/generate-qr-code";
   // private redirectUri = "http://localhost:4200/generate-qr-code";
   private authorizationServerUri =
     "https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0";
