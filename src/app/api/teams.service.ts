@@ -20,25 +20,26 @@ export type TeamsUserInfo = {
   providedIn: "root"
 })
 export class TeamsService {
-  private redirectUri = "http://localhost:4200/generate-qr-code";
+  private redirectUri = "https://main--effervescent-kataifi-334518.netlify.app/generate-qr-code";
+  // private redirectUri = "http://localhost:4200/generate-qr-code";
+  private authorizationServerUri =
+    "https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0";
 
   constructor(private httpClient: HttpClient) {}
 
   async getTeamsLoginPage(): Promise<{ codeVerifier: string; loginUrl: string }> {
     const codeVerifier = this.getRandomString(128);
 
-    const loginUrl = `https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0/authorize?${new URLSearchParams(
-      {
-        client_id: "7ae052f5-54fa-4323-840e-f39d141c87a6",
-        response_type: "code",
-        redirect_uri: this.redirectUri,
-        response_mode: "query",
-        scope: "User.Read",
-        state: "12345",
-        code_challenge: await this.getCodeChallenge(codeVerifier),
-        code_challenge_method: "S256"
-      }
-    )}`;
+    const loginUrl = `${this.authorizationServerUri}/authorize?${new URLSearchParams({
+      client_id: "7ae052f5-54fa-4323-840e-f39d141c87a6",
+      response_type: "code",
+      redirect_uri: this.redirectUri,
+      response_mode: "query",
+      scope: "User.Read",
+      state: "12345",
+      code_challenge: await this.getCodeChallenge(codeVerifier),
+      code_challenge_method: "S256"
+    })}`;
 
     return { codeVerifier, loginUrl };
   }
@@ -53,7 +54,7 @@ export class TeamsService {
       .set("code_verifier", codeVerifier);
 
     return this.httpClient.post<AccessTokenRequestResponse>(
-      "https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0/token",
+      `${this.authorizationServerUri}/token`,
       postData,
       { headers: { "content-type": "application/x-www-form-urlencoded" } }
     );
