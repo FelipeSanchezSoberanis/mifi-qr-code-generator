@@ -9,6 +9,7 @@
       <div class="mb-3">
         <label class="form-label required-input">Nombre completo</label>
         <input
+          [readOnly]="readOnlyFields.name"
           formControlName="name"
           type="email"
           class="form-control"
@@ -31,6 +32,7 @@
           Matrícula</label
         >
         <input
+          [readOnly]="readOnlyFields.enrollmentId"
           formControlName="enrollmentId"
           type="number"
           class="form-control"
@@ -51,6 +53,7 @@
       <div class="mb-3">
         <label class="form-label required-input">Correo</label>
         <input
+          [readOnly]="readOnlyFields.email"
           formControlName="email"
           type="email"
           class="form-control"

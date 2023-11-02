@@ -24,6 +24,7 @@ export class GenerateQrCodeViewComponent {
   qrCodeDataString: string | null = null;
   qrCodeUrl: SafeUrl | null = null;
   authenticatedWithTeams: boolean = false;
+  readOnlyFields = { name: false, email: false, enrollmentId: false };
 
   qrCodeDataForm = new FormGroup({
     name: new FormControl<string>("", Validators.required),
@@ -66,19 +67,19 @@ export class GenerateQrCodeViewComponent {
 
   setFormDataFromTeamsInfo({ displayName, mail }: TeamsUserInfo) {
     if (mail) {
-      this.qrCodeDataForm.patchValue({ email: mail });
-      this.qrCodeDataForm.get("email")?.disable();
+      this.qrCodeDataForm.patchValue({ email: mail.trim() });
+      this.readOnlyFields.email = true;
 
       if (this.isInstitutionalEmail(mail)) {
         const enrollmentId = Number(mail.substring(1, 9));
         this.qrCodeDataForm.patchValue({ enrollmentId });
-        this.qrCodeDataForm.get("enrollmentId")?.disable();
+        this.readOnlyFields.enrollmentId = true;
       }
     }
 
     if (displayName) {
       this.qrCodeDataForm.patchValue({ name: displayName.trim().toUpperCase() });
-      this.qrCodeDataForm.get("name")?.disable();
+      this.readOnlyFields.name = true;
     }
 
     this.qrCodeDataForm.updateValueAndValidity();
