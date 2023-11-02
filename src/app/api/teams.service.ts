@@ -1,6 +1,15 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 
+type AccessTokenRequestResponse = {
+  access_token: string;
+  expires_in: number;
+  ext_expires_in: number;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
+};
+
 @Injectable({
   providedIn: "root"
 })
@@ -26,23 +35,16 @@ export class TeamsService {
     return { codeVerifier, loginUrl };
   }
 
-  getAccessToken(code: string) {
+  getAccessToken(code: string, codeVerifier: string) {
     const postData = new HttpParams()
       .set("client_id", "7ae052f5-54fa-4323-840e-f39d141c87a6")
       .set("scope", "User.Read")
       .set("code", code)
       .set("redirect_uri", "http://localhost:4200/generate-qr-code")
       .set("grant_type", "authorization_code")
-      .set("code_verifier", localStorage.getItem("codeVerifier")!);
+      .set("code_verifier", codeVerifier);
 
-    return this.httpClient.post<{
-      access_token: string;
-      expires_in: number;
-      ext_expires_in: number;
-      refresh_token: string;
-      scope: string;
-      token_type: string;
-    }>(
+    return this.httpClient.post<AccessTokenRequestResponse>(
       "https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0/token",
       postData,
       { headers: { "content-type": "application/x-www-form-urlencoded" } }

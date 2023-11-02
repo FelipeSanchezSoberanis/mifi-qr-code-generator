@@ -1,10 +1,8 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { ConditionalExpr } from "@angular/compiler";
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
-import { ActivatedRoute, Params, Route, Router } from "@angular/router";
-import { concat, concatMap, filter, mergeMap } from "rxjs";
+import { ActivatedRoute, Params, Router } from "@angular/router";
+import { filter, mergeMap } from "rxjs";
 import { TeamsService } from "src/app/api/teams.service";
 import Swal from "sweetalert2";
 
@@ -22,7 +20,7 @@ interface QrCodeData {
   templateUrl: "./generate-qr-code-view.component.html",
   styleUrls: ["./generate-qr-code-view.component.scss"]
 })
-export class GenerateQrCodeViewComponent implements OnInit {
+export class GenerateQrCodeViewComponent {
   qrCodeDataString: string | null = null;
   qrCodeUrl: SafeUrl | null = null;
   authenticatedWithTeams: boolean = false;
@@ -43,58 +41,57 @@ export class GenerateQrCodeViewComponent implements OnInit {
     ])
   });
 
-  constructor(private router: Router, route: ActivatedRoute, private teamsService: TeamsService) {
+  constructor(
+    private router: Router,
+    route: ActivatedRoute,
+    private teamsService: TeamsService
+  ) {
     const codeIsInParams = (params: Params): params is { code: string } =>
       typeof params["code"] === "string";
 
     route.queryParams
       .pipe(
         filter(codeIsInParams),
-        mergeMap(({ code }) => teamsService.getAccessToken(code)),
+        mergeMap(({ code }) =>
+          teamsService.getAccessToken(code, localStorage.getItem("codeVerifier")!)
+        ),
         mergeMap(({ access_token }) => teamsService.getLoggedInUserInfo(access_token))
       )
       .subscribe((teamsInfo) => this.setFormDataFromTeamsInfo(teamsInfo));
   }
 
-  setFormDataFromTeamsInfo(teamsInfo: { displayName?: string; id?: string; mail?: string }) {
-    const enrollmentId = teamsInfo.mail?.substring(1, 9);
-
-    if (enrollmentId) {
-      this.qrCodeDataForm.patchValue({ enrollmentId: Number(enrollmentId) });
-      this.qrCodeDataForm.get("enrollmentId")?.disable();
-    }
-
-    this.qrCodeDataForm.patchValue({
-      name: teamsInfo.displayName,
-      email: teamsInfo.mail
-    });
-
-    this.qrCodeDataForm.get("name")?.disable();
-    this.qrCodeDataForm.get("email")?.disable();
-
-    this.qrCodeDataForm.updateValueAndValidity();
-
-    this.authenticatedWithTeams = true;
-    this.router.navigateByUrl("/generate-qr-code");
+  private isInstitutionalEmail(email: string): boolean {
+    return /^a\d{8}@alumnos\.uady\.mx$/i.test(email);
   }
 
-  ngOnInit(): void {
-    this.qrCodeDataForm.controls.startingSemester.valueChanges.subscribe((startingSemester) => {
-      if (startingSemester === "Enero 2024") {
-        this.qrCodeDataForm.controls.enrollmentId.setValidators([
-          Validators.min(11111111),
-          Validators.max(99999999)
-        ]);
-      } else {
-        this.qrCodeDataForm.controls.enrollmentId.setValidators([
-          Validators.required,
-          Validators.min(11111111),
-          Validators.max(99999999)
-        ]);
-      }
+  setFormDataFromTeamsInfo({
+    displayName,
+    id,
+    mail
+  }: {
+    displayName?: string;
+    id?: string;
+    mail?: string;
+  }) {
+    if (mail) {
+      this.qrCodeDataForm.patchValue({ email: mail });
+      this.qrCodeDataForm.get("email")?.disable();
 
-      this.qrCodeDataForm.controls.enrollmentId.updateValueAndValidity();
-    });
+      if (this.isInstitutionalEmail(mail)) {
+        const enrollmentId = Number(mail.substring(1, 9));
+        this.qrCodeDataForm.patchValue({ enrollmentId });
+        this.qrCodeDataForm.get("enrollmentId")?.disable();
+      }
+    }
+
+    if (displayName) {
+      this.qrCodeDataForm.patchValue({ name: displayName.trim().toUpperCase() });
+      this.qrCodeDataForm.get("name")?.disable();
+    }
+
+    this.qrCodeDataForm.updateValueAndValidity();
+    this.authenticatedWithTeams = true;
+    this.router.navigateByUrl("/generate-qr-code");
   }
 
   handleGenerateQrCodeClick() {
