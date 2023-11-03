@@ -95,19 +95,18 @@ export class GenerateQrCodeViewComponent {
       title: "Por favor, revisa tu información antes de continuar",
       html: `
         Nombre: ${qrCodeData.name} <br>
-        Matrícula: ${qrCodeData.enrollmentId ? qrCodeData.enrollmentId : "No indicado"} <br>
+        Matrícula: ${qrCodeData.enrollmentId || "No indicado"} <br>
         Semestre de inicio: ${qrCodeData.startingSemester} <br>
         Carrera: ${qrCodeData.career} <br>
         Correo: ${qrCodeData.email} <br>
-        Teléfono: ${qrCodeData.phoneNumber ? qrCodeData.phoneNumber : "No indicado"} <br>
+        Teléfono: ${qrCodeData.phoneNumber || "No indicado"} <br>
       `,
       showConfirmButton: true,
       confirmButtonText: "Obtener código QR",
       showDenyButton: true,
       denyButtonText: "Corregir información"
     }).then((result) => {
-      if (result.isConfirmed)
-        this.qrCodeDataString = `${qrCodeData.name}$${qrCodeData.enrollmentId}$${qrCodeData.startingSemester}$${qrCodeData.email}$${qrCodeData.phoneNumber}`;
+      if (result.isConfirmed) this.qrCodeDataString = JSON.stringify(qrCodeData);
     });
   }
 
