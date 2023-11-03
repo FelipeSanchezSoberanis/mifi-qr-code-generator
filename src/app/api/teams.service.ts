@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { environment } from "../../environments/environment";
 
 type AccessTokenRequestResponse = {
   access_token: string;
@@ -20,12 +21,13 @@ export type TeamsUserInfo = {
   providedIn: "root"
 })
 export class TeamsService {
-  private redirectUri = "https://mifi-fiuady.netlify.app/generate-qr-code";
-  // private redirectUri = "http://localhost:4200/generate-qr-code";
+  private redirectUri: string;
   private authorizationServerUri =
     "https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0";
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+    this.redirectUri = environment.teamsRedirectUri;
+  }
 
   async getTeamsLoginPage(): Promise<{ codeVerifier: string; loginUrl: string }> {
     const codeVerifier = this.getRandomString(128);
