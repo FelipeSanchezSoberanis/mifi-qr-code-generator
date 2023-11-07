@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Params, Router } from "@angular/router";
-import { filter, mergeMap } from "rxjs";
+import { concatMap, filter, mergeMap } from "rxjs";
 import { TeamsService, TeamsUserInfo } from "src/app/api/teams.service";
 import Swal from "sweetalert2";
 
@@ -42,23 +42,72 @@ export class GenerateQrCodeViewComponent {
     ])
   });
 
-  constructor(
-    private router: Router,
-    route: ActivatedRoute,
-    private teamsService: TeamsService
-  ) {
+  constructor(private router: Router, route: ActivatedRoute, private teamsService: TeamsService) {
     const codeIsInParams = (params: Params): params is { code: string } =>
       typeof params["code"] === "string";
 
     route.queryParams
       .pipe(
         filter(codeIsInParams),
-        mergeMap(({ code }) =>
-          teamsService.getAccessToken(code, localStorage.getItem("codeVerifier")!)
-        ),
+        mergeMap(({ code }) => this.getTeamsAccessToken(code)),
         mergeMap(({ access_token }) => teamsService.getLoggedInUserInfo(access_token))
       )
-      .subscribe((teamsInfo) => this.setFormDataFromTeamsInfo(teamsInfo));
+      .subscribe({
+        next: (teamsInfo) => this.handleInfoFromTeamsObtained(teamsInfo),
+        error: (error) => this.handleErrorFetchingTeamsInfo(error)
+      });
+  }
+
+  private handleInfoFromTeamsObtained(teamsInfo: TeamsUserInfo) {
+    this.setFormDataFromTeamsInfo(teamsInfo);
+    this.handleInfoFromTeamsSet();
+  }
+
+  private async handleErrorFetchingTeamsInfo(error: any) {
+    const res = await Swal.fire({
+      title: "Error obteniendo datos de Teams",
+      text: JSON.stringify(error),
+      icon: "error",
+      allowEnterKey: false,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: true
+    });
+
+    if (!res.isConfirmed) return;
+
+    this.qrCodeDataForm.updateValueAndValidity();
+    this.authenticatedWithTeams = true;
+    this.router.navigateByUrl("/generate-qr-code");
+  }
+
+  private async handleInfoFromTeamsSet() {
+    const res = await Swal.fire({
+      title: "Datos obtenidos de Teams",
+      icon: "success",
+      allowEnterKey: false,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: true
+    });
+
+    if (!res.isConfirmed) return;
+
+    this.qrCodeDataForm.updateValueAndValidity();
+    this.authenticatedWithTeams = true;
+    this.router.navigateByUrl("/generate-qr-code");
+  }
+
+  private getTeamsAccessToken(code: string) {
+    Swal.fire({
+      title: "Obteniendo datos de Teams",
+      didOpen: () => Swal.showLoading(),
+      allowEnterKey: false,
+      allowEscapeKey: false,
+      allowOutsideClick: false
+    });
+
+    return this.teamsService.getAccessToken(code, localStorage.getItem("codeVerifier")!);
   }
 
   private isInstitutionalEmail(email: string): boolean {
@@ -81,10 +130,6 @@ export class GenerateQrCodeViewComponent {
       this.qrCodeDataForm.patchValue({ name: displayName.trim().toUpperCase() });
       this.readOnlyFields.name = true;
     }
-
-    this.qrCodeDataForm.updateValueAndValidity();
-    this.authenticatedWithTeams = true;
-    this.router.navigateByUrl("/generate-qr-code");
   }
 
   handleGenerateQrCodeClick() {
