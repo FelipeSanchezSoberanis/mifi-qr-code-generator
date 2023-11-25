@@ -1,6 +1,8 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { environment } from "../../environments/environment";
+import { Client, calculatePKCECodeChallenge, generateRandomCodeVerifier } from "oauth4webapi";
+import { Observable } from "rxjs";
 
 type AccessTokenRequestResponse = {
   access_token: string;
@@ -21,32 +23,31 @@ export type TeamsUserInfo = {
   providedIn: "root"
 })
 export class TeamsService {
-  private redirectUri: string;
-  private authorizationServerUri =
+  private httpClient = inject(HttpClient);
+
+  private redirectUri = environment.teamsRedirectUri;
+  private client: Client = {
+    client_id: "7ae052f5-54fa-4323-840e-f39d141c87a6",
+    token_endpoint_auth_method: "none"
+  };
+  private authorizationServerUrl =
     "https://login.microsoftonline.com/2b83ac9e-2448-45df-9319-48d86236a5ea/oauth2/v2.0";
 
-  constructor(private httpClient: HttpClient) {
-    this.redirectUri = environment.teamsRedirectUri;
+  async getTeamsAuthorizationUrl(): Promise<{ codeVerifier: string; authorizationUrl: URL }> {
+    const codeVerifier = generateRandomCodeVerifier();
+    const codeChallenge = await calculatePKCECodeChallenge(codeVerifier);
+    const codeChallengeMethod = "S256";
+    const authorizationUrl = new URL(`${this.authorizationServerUrl}/authorize`);
+    authorizationUrl.searchParams.set("client_id", this.client.client_id);
+    authorizationUrl.searchParams.set("code_challenge", codeChallenge);
+    authorizationUrl.searchParams.set("code_challenge_method", codeChallengeMethod);
+    authorizationUrl.searchParams.set("redirect_uri", this.redirectUri);
+    authorizationUrl.searchParams.set("response_type", "code");
+    authorizationUrl.searchParams.set("scope", "User.Read");
+    return { codeVerifier, authorizationUrl };
   }
 
-  async getTeamsLoginPage(): Promise<{ codeVerifier: string; loginUrl: string }> {
-    const codeVerifier = this.getRandomString(128);
-
-    const loginUrl = `${this.authorizationServerUri}/authorize?${new URLSearchParams({
-      client_id: "7ae052f5-54fa-4323-840e-f39d141c87a6",
-      response_type: "code",
-      redirect_uri: this.redirectUri,
-      response_mode: "query",
-      scope: "User.Read",
-      state: "12345",
-      code_challenge: await this.getCodeChallenge(codeVerifier),
-      code_challenge_method: "S256"
-    })}`;
-
-    return { codeVerifier, loginUrl };
-  }
-
-  getAccessToken(code: string, codeVerifier: string) {
+  getAccessToken(code: string, codeVerifier: string): Observable<AccessTokenRequestResponse> {
     const postData = new HttpParams()
       .set("client_id", "7ae052f5-54fa-4323-840e-f39d141c87a6")
       .set("scope", "User.Read")
@@ -56,7 +57,7 @@ export class TeamsService {
       .set("code_verifier", codeVerifier);
 
     return this.httpClient.post<AccessTokenRequestResponse>(
-      `${this.authorizationServerUri}/token`,
+      `${this.authorizationServerUrl}/token`,
       postData,
       { headers: { "content-type": "application/x-www-form-urlencoded" } }
     );
@@ -66,22 +67,5 @@ export class TeamsService {
     return this.httpClient.get<TeamsUserInfo>("https://graph.microsoft.com/v1.0/me", {
       headers: { authorization: `Bearer ${accessToken}` }
     });
-  }
-
-  private getRandomString(length: number): string {
-    let text = "";
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  }
-
-  private async getCodeChallenge(codeVerifier: string): Promise<string> {
-    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(codeVerifier));
-    return btoa(String.fromCharCode(...new Uint8Array(digest)))
-      .replace(/=/g, "")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
   }
 }

@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Params, Router } from "@angular/router";
 import { filter, mergeMap } from "rxjs";
@@ -48,20 +48,20 @@ export class GenerateQrCodeViewComponent {
       .pipe(
         filter(codeIsInParams),
         mergeMap(({ code }) => this.getTeamsAccessToken(code)),
-        mergeMap(({ access_token }) => teamsService.getLoggedInUserInfo(access_token))
+        mergeMap(({ access_token: accessToken }) => teamsService.getLoggedInUserInfo(accessToken))
       )
       .subscribe({
-        next: (teamsInfo) => this.handleInfoFromTeamsObtained(teamsInfo),
-        error: (error) => this.handleErrorFetchingTeamsInfo(error)
+        next: this.handleInfoFromTeamsObtained,
+        error: this.handleErrorFetchingTeamsInfo
       });
   }
 
-  private handleInfoFromTeamsObtained(teamsInfo: TeamsUserInfo) {
+  private handleInfoFromTeamsObtained = (teamsInfo: TeamsUserInfo) => {
     this.setFormDataFromTeamsInfo(teamsInfo);
     this.handleInfoFromTeamsSet();
-  }
+  };
 
-  private async handleErrorFetchingTeamsInfo(error: any) {
+  private handleErrorFetchingTeamsInfo = async (error: any) => {
     const res = await Swal.fire({
       title: "Error obteniendo datos de Teams",
       text: JSON.stringify(error),
@@ -77,7 +77,7 @@ export class GenerateQrCodeViewComponent {
     this.qrCodeDataForm.updateValueAndValidity();
     this.authenticatedWithTeams = true;
     this.router.navigateByUrl("/generate-qr-code");
-  }
+  };
 
   private async handleInfoFromTeamsSet() {
     const res = await Swal.fire({
@@ -162,8 +162,8 @@ export class GenerateQrCodeViewComponent {
   }
 
   async getMicrosoftTeamsLoginPage() {
-    const { codeVerifier, loginUrl } = await this.teamsService.getTeamsLoginPage();
+    const { codeVerifier, authorizationUrl } = await this.teamsService.getTeamsAuthorizationUrl();
     localStorage.setItem("codeVerifier", codeVerifier);
-    window.location.href = loginUrl;
+    window.location.href = authorizationUrl.toString();
   }
 }
