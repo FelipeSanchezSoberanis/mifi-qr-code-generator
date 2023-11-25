@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Params, Router } from "@angular/router";
@@ -21,6 +21,11 @@ type QrCodeData = {
   styleUrls: ["./generate-qr-code-view.component.scss"]
 })
 export class GenerateQrCodeViewComponent {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private teamsService = inject(TeamsService);
+  private formBuilder = inject(FormBuilder);
+
   qrCodeDataString: string | null = null;
   qrCodeUrl: SafeUrl | null = null;
   authenticatedWithTeams: boolean = false;
@@ -35,20 +40,17 @@ export class GenerateQrCodeViewComponent {
     phoneNumber: ["", [Validators.pattern(/\d{10}/)]]
   });
 
-  constructor(
-    private router: Router,
-    route: ActivatedRoute,
-    private teamsService: TeamsService,
-    private formBuilder: FormBuilder
-  ) {
+  constructor() {
     const codeIsInParams = (params: Params): params is { code: string } =>
       typeof params["code"] === "string";
 
-    route.queryParams
+    this.route.queryParams
       .pipe(
         filter(codeIsInParams),
         mergeMap(this.getTeamsAccessToken),
-        mergeMap(({ access_token: accessToken }) => teamsService.getLoggedInUserInfo(accessToken))
+        mergeMap(({ access_token: accessToken }) =>
+          this.teamsService.getLoggedInUserInfo(accessToken)
+        )
       )
       .subscribe({
         next: this.handleInfoFromTeamsObtained,
