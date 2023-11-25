@@ -47,7 +47,7 @@ export class GenerateQrCodeViewComponent {
     route.queryParams
       .pipe(
         filter(codeIsInParams),
-        mergeMap(({ code }) => this.getTeamsAccessToken(code)),
+        mergeMap(this.getTeamsAccessToken),
         mergeMap(({ access_token: accessToken }) => teamsService.getLoggedInUserInfo(accessToken))
       )
       .subscribe({
@@ -96,7 +96,7 @@ export class GenerateQrCodeViewComponent {
     this.router.navigateByUrl("/generate-qr-code");
   }
 
-  private getTeamsAccessToken(code: string) {
+  private getTeamsAccessToken = ({ code }: { code: string }) => {
     Swal.fire({
       title: "Obteniendo datos de Teams",
       didOpen: () => Swal.showLoading(),
@@ -106,7 +106,7 @@ export class GenerateQrCodeViewComponent {
     });
 
     return this.teamsService.getAccessToken(code, localStorage.getItem("codeVerifier")!);
-  }
+  };
 
   private isInstitutionalEmail(email: string): boolean {
     return /^a\d{8}@alumnos\.uady\.mx$/i.test(email);
