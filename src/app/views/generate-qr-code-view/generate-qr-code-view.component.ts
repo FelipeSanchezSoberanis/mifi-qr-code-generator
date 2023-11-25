@@ -132,6 +132,10 @@ export class GenerateQrCodeViewComponent {
 
   handleGenerateQrCodeClick() {
     const qrCodeData = this.qrCodeDataForm.value as QrCodeData;
+    const qrCodeDataKeys = Object.keys(qrCodeData) as (keyof QrCodeData)[];
+    const qrCodeDataValuesOrderedByKeys = qrCodeDataKeys
+      .sort()
+      .map((key) => qrCodeData[key] as string);
 
     Swal.fire({
       icon: "warning",
@@ -149,7 +153,7 @@ export class GenerateQrCodeViewComponent {
       showDenyButton: true,
       denyButtonText: "Corregir información"
     }).then((result) => {
-      if (result.isConfirmed) this.qrCodeDataString = JSON.stringify(qrCodeData);
+      if (result.isConfirmed) this.qrCodeDataString = JSON.stringify(qrCodeDataValuesOrderedByKeys);
     });
   }
 
