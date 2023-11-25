@@ -1,19 +1,19 @@
 import { Component } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Params, Router } from "@angular/router";
-import { concatMap, filter, mergeMap } from "rxjs";
+import { filter, mergeMap } from "rxjs";
 import { TeamsService, TeamsUserInfo } from "src/app/api/teams.service";
 import Swal from "sweetalert2";
 
-interface QrCodeData {
+type QrCodeData = {
   name: string;
-  enrollmentId: number | null;
-  startingSemester: string | null;
-  career: string | null;
+  enrollmentId: string;
+  startingSemester: string;
+  career: string;
   email: string;
-  phoneNumber: number | null;
-}
+  phoneNumber: string;
+};
 
 @Component({
   selector: "app-generate-qr-code-view",
@@ -26,23 +26,21 @@ export class GenerateQrCodeViewComponent {
   authenticatedWithTeams: boolean = false;
   readOnlyFields = { name: false, email: false, enrollmentId: false };
 
-  qrCodeDataForm = new FormGroup({
-    name: new FormControl<string>("", Validators.required),
-    enrollmentId: new FormControl<number | null>(null, [
-      Validators.required,
-      Validators.min(0),
-      Validators.max(99999999)
-    ]),
-    startingSemester: new FormControl<string | null>(null, Validators.required),
-    career: new FormControl<string | null>(null, Validators.required),
-    email: new FormControl<string>("", [Validators.required, Validators.email]),
-    phoneNumber: new FormControl<number | null>(null, [
-      Validators.min(1111111111),
-      Validators.max(9999999999)
-    ])
+  qrCodeDataForm = this.formBuilder.group({
+    name: ["", Validators.required],
+    enrollmentId: ["", [Validators.required, Validators.pattern(/\d{8}/)]],
+    startingSemester: ["", Validators.required],
+    career: ["", [Validators.required]],
+    email: ["", [Validators.required, Validators.email]],
+    phoneNumber: ["", [Validators.pattern(/\d{10}/)]]
   });
 
-  constructor(private router: Router, route: ActivatedRoute, private teamsService: TeamsService) {
+  constructor(
+    private router: Router,
+    route: ActivatedRoute,
+    private teamsService: TeamsService,
+    private formBuilder: FormBuilder
+  ) {
     const codeIsInParams = (params: Params): params is { code: string } =>
       typeof params["code"] === "string";
 
@@ -120,7 +118,7 @@ export class GenerateQrCodeViewComponent {
       this.readOnlyFields.email = true;
 
       if (this.isInstitutionalEmail(mail)) {
-        const enrollmentId = Number(mail.substring(1, 9));
+        const enrollmentId = mail.substring(1, 9);
         this.qrCodeDataForm.patchValue({ enrollmentId });
         this.readOnlyFields.enrollmentId = true;
       }
