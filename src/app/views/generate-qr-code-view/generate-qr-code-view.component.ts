@@ -172,4 +172,14 @@ export class GenerateQrCodeViewComponent {
     localStorage.setItem("codeVerifier", codeVerifier);
     window.location.href = authorizationUrl.toString();
   }
+
+  getStartingSemesters = (date?: Date): string[] => {
+    const now = date || new Date();
+
+    if (now.getMonth() <= 5) {
+      return [`Agosto ${now.getFullYear() - 1}`, `Enero ${now.getFullYear()}`];
+    } else {
+      return [`Agosto ${now.getFullYear()}`, `Enero ${now.getFullYear() + 1}`];
+    }
+  };
 }

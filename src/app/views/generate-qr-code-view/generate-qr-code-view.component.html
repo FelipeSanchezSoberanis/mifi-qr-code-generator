@@ -20,8 +20,12 @@
       <div class="mb-3">
         <label class="form-label required-input">Semestre de inicio</label>
         <select formControlName="startingSemester" class="form-select">
-          <option>Agosto 2023</option>
-          <option>Enero 2024</option>
+          <option
+            [value]="startingSemester"
+            *ngFor="let startingSemester of getStartingSemesters()"
+          >
+            {{ startingSemester }}
+          </option>
         </select>
         <form-error-message
           [control]="qrCodeDataForm.controls.startingSemester"
