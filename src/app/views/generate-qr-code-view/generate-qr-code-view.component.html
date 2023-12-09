@@ -1,94 +1,115 @@
 <main class="container">
-  <h1 *ngIf="!qrCodeDataString" class="text-center">Genera tu código QR</h1>
-  <p *ngIf="!qrCodeDataString" class="text-center">
-    No olvides guardar el QR generado con tu información! Ya que será usado para tu pase de lista en
-    las actividades de MIFI.
-  </p>
-  <form *ngIf="!qrCodeDataString" [formGroup]="qrCodeDataForm" class="mb-5">
-    <div class="mb-3">
-      <label class="form-label required-input">Nombre completo</label>
-      <input
-        formControlName="name"
-        type="email"
-        class="form-control"
-        placeholder="José Pedro Sánchez Pedrera"
-      />
-      <form-error-message [control]="qrCodeDataForm.controls.name"></form-error-message>
-    </div>
-    <div class="mb-3">
-      <label class="form-label required-input">Semestre de inicio</label>
-      <select formControlName="startingSemester" class="form-select">
-        <option>Agosto 2023</option>
-        <option>Enero 2024</option>
-      </select>
-      <form-error-message [control]="qrCodeDataForm.controls.startingSemester"></form-error-message>
-    </div>
-    <div class="mb-3">
-      <label class="form-label" [class]="{ 'required-input': enrollmentIdIsRequired() }">
-        Matrícula</label
-      >
-      <input
-        formControlName="enrollmentId"
-        type="number"
-        class="form-control"
-        placeholder="18214854"
-      />
-      <form-error-message [control]="qrCodeDataForm.controls.enrollmentId"></form-error-message>
-    </div>
-    <div class="mb-3">
-      <label class="form-label required-input">Carrera</label>
-      <select formControlName="career" class="form-select">
-        <option>Ingeniería civil</option>
-        <option>Ingeniería en energías renovables</option>
-        <option>Ingeniería física</option>
-        <option>Ingeniería mecatrónica</option>
-      </select>
-      <form-error-message [control]="qrCodeDataForm.controls.career"></form-error-message>
-    </div>
-    <div class="mb-3">
-      <label class="form-label required-input">Correo</label>
-      <input
-        formControlName="email"
-        type="email"
-        class="form-control"
-        placeholder="correo@ejemplo.com"
-      />
-      <form-error-message [control]="qrCodeDataForm.controls.email"></form-error-message>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Teléfono</label>
-      <input
-        formControlName="phoneNumber"
-        type="number"
-        class="form-control"
-        placeholder="9991223817"
-      />
-      <form-error-message [control]="qrCodeDataForm.controls.phoneNumber"></form-error-message>
-    </div>
-    <div *ngIf="!qrCodeDataString" class="mb-3 row justify-content-center">
-      <button
-        (click)="handleGenerateQrCodeClick()"
-        [disabled]="qrCodeDataForm.invalid"
-        class="btn btn-primary col-auto"
-      >
-        Generar código QR
-      </button>
-    </div>
-  </form>
+  <ng-container *ngIf="authenticatedWithTeams">
+    <h1 *ngIf="!qrCodeDataString" class="text-center">Genera tu código QR</h1>
+    <p *ngIf="!qrCodeDataString" class="text-center">
+      No olvides guardar el QR generado con tu información! Ya que será usado para tu pase de lista
+      en las actividades de MIFI.
+    </p>
+    <form *ngIf="!qrCodeDataString" [formGroup]="qrCodeDataForm" class="mb-5">
+      <div class="mb-3">
+        <label class="form-label required-input">Nombre completo</label>
+        <input
+          [readOnly]="readOnlyFields.name"
+          formControlName="name"
+          type="email"
+          class="form-control"
+          placeholder="José Pedro Sánchez Pedrera"
+        />
+        <form-error-message [control]="qrCodeDataForm.controls.name"></form-error-message>
+      </div>
+      <div class="mb-3">
+        <label class="form-label required-input">Semestre de inicio</label>
+        <select formControlName="startingSemester" class="form-select">
+          <option
+            [value]="startingSemester"
+            *ngFor="let startingSemester of getStartingSemesters()"
+          >
+            {{ startingSemester }}
+          </option>
+        </select>
+        <form-error-message
+          [control]="qrCodeDataForm.controls.startingSemester"
+        ></form-error-message>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" [class]="{ 'required-input': enrollmentIdIsRequired() }">
+          Matrícula</label
+        >
+        <input
+          [readOnly]="readOnlyFields.enrollmentId"
+          formControlName="enrollmentId"
+          type="string"
+          class="form-control"
+          placeholder="18214854"
+        />
+        <form-error-message [control]="qrCodeDataForm.controls.enrollmentId"></form-error-message>
+      </div>
+      <div class="mb-3">
+        <label class="form-label required-input">Carrera</label>
+        <select formControlName="career" class="form-select">
+          <option>Ingeniería civil</option>
+          <option>Ingeniería en energías renovables</option>
+          <option>Ingeniería física</option>
+          <option>Ingeniería mecatrónica</option>
+        </select>
+        <form-error-message [control]="qrCodeDataForm.controls.career"></form-error-message>
+      </div>
+      <div class="mb-3">
+        <label class="form-label required-input">Correo</label>
+        <input
+          [readOnly]="readOnlyFields.email"
+          formControlName="email"
+          type="email"
+          class="form-control"
+          placeholder="correo@ejemplo.com"
+        />
+        <form-error-message [control]="qrCodeDataForm.controls.email"></form-error-message>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input
+          formControlName="phoneNumber"
+          type="string"
+          class="form-control"
+          placeholder="9991223817"
+        />
+        <form-error-message [control]="qrCodeDataForm.controls.phoneNumber"></form-error-message>
+      </div>
+      <div *ngIf="!qrCodeDataString" class="mb-3 row justify-content-center">
+        <button
+          (click)="handleGenerateQrCodeClick()"
+          [disabled]="qrCodeDataForm.invalid"
+          class="btn btn-primary col-auto"
+        >
+          Generar código QR
+        </button>
+      </div>
+    </form>
 
-  <div *ngIf="qrCodeDataString">
-    <h1 class="text-center">Tu código QR para el pase de lista</h1>
-    <qrcode
-      class="text-center"
-      (qrCodeURL)="handleQrCodeUrlChange($event)"
-      [qrdata]="qrCodeDataString"
-      [width]="256"
-      errorCorrectionLevel="L"
-    ></qrcode>
-    <div class="row justify-content-center">
-      <a [href]="qrCodeUrl" download="qr" class="col-auto">
-        <button class="btn btn-primary">Descargar</button>
-      </a>
+    <div *ngIf="qrCodeDataString">
+      <h1 class="text-center">Tu código QR para el pase de lista</h1>
+      <qrcode
+        class="text-center"
+        (qrCodeURL)="handleQrCodeUrlChange($event)"
+        [qrdata]="qrCodeDataString"
+        [width]="256"
+        errorCorrectionLevel="L"
+      ></qrcode>
+      <div class="row justify-content-center">
+        <a [href]="qrCodeUrl" download="qr" class="col-auto">
+          <button class="btn btn-primary">Descargar</button>
+        </a>
+      </div>
     </div>
-  </div>
+  </ng-container>
+  <ng-container *ngIf="!authenticatedWithTeams">
+    <h1 class="text-center">Entra con tu correo institucional</h1>
+    <button
+      class="position-absolute start-50 top-50 btn btn-primary"
+      style="transform: translate(-50%, -50%)"
+      (click)="getMicrosoftTeamsLoginPage()"
+    >
+      Log in
+    </button>
+  </ng-container>
 </main>
