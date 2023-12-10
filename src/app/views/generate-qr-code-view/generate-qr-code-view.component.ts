@@ -6,7 +6,7 @@ import { filter, mergeMap } from "rxjs";
 import { TeamsService, TeamsUserInfo } from "src/app/api/teams.service";
 import Swal from "sweetalert2";
 
-type QrCodeData = {
+export type QrCodeData = {
   name: string;
   enrollmentId: string;
   startingSemester: string;

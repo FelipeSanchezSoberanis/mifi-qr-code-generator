@@ -10,6 +10,7 @@ import { QRCodeModule } from "angularx-qrcode";
 import { JoinCsvsViewComponent } from "./views/join-csvs-view/join-csvs-view.component";
 import { HomeViewComponent } from "./views/home-view/home-view.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
+import { AssistanceReportViewComponent } from "./views/assistance-report-view/assistance-report-view.component";
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { NavbarComponent } from "./components/navbar/navbar.component";
     FormErrorMessageComponent,
     JoinCsvsViewComponent,
     HomeViewComponent,
-    NavbarComponent
+    NavbarComponent,
+    AssistanceReportViewComponent
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, QRCodeModule, HttpClientModule],
   providers: [],

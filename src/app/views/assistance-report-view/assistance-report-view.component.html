@@ -1,0 +1,36 @@
+<main class="container">
+  <h1 class="text-center mb-3">Generar reporte de asistencias</h1>
+
+  <div
+    *ngFor="let session of sessions.controls; index as i"
+    class="row justify-content-center mb-3"
+  >
+    <div class="col-auto">
+      <label class="col-form-label">Sesión</label>
+    </div>
+    <div class="col-auto">
+      <input [formControl]="session" class="form-control" type="date" />
+    </div>
+    <div class="col-auto">
+      <button (click)="deleteSession(i)" class="btn btn-danger">x</button>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mb-3">
+    <div class="col-auto">
+      <button (click)="addSession()" class="btn btn-primary">Agregar sesión</button>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <input
+        [disabled]="!sessions.valid || sessions.controls.length <= 0"
+        class="form-control"
+        type="file"
+        accept=".csv"
+        multiple
+      />
+    </div>
+  </div>
+</main>
