@@ -52,6 +52,24 @@ const registrations: StudentRegistration[] = [
     registrationTime: "2000-01-08"
   },
   {
+    name: "STUDENT_3",
+    enrollmentId: "ID_3",
+    startingSemester: "SEMESTER_3",
+    career: "CAREER_3",
+    email: "EMAIL_3",
+    phoneNumber: "PHONE_NUMBER_3",
+    registrationTime: "2000-02-08"
+  },
+  {
+    name: "STUDENT_3",
+    enrollmentId: "ID_3",
+    startingSemester: "SEMESTER_3",
+    career: "CAREER_3",
+    email: "EMAIL_3",
+    phoneNumber: "PHONE_NUMBER_3",
+    registrationTime: "2001-01-08"
+  },
+  {
     name: "STUDENT_1",
     enrollmentId: "ID_1",
     startingSemester: "SEMESTER_1",
@@ -59,6 +77,24 @@ const registrations: StudentRegistration[] = [
     email: "EMAIL_1",
     phoneNumber: "PHONE_NUMBER_1",
     registrationTime: "2000-01-15"
+  },
+  {
+    name: "STUDENT_2",
+    enrollmentId: "ID_2",
+    startingSemester: "SEMESTER_2",
+    career: "CAREER_2",
+    email: "EMAIL_2",
+    phoneNumber: "PHONE_NUMBER_2",
+    registrationTime: "2000-02-15"
+  },
+  {
+    name: "STUDENT_3",
+    enrollmentId: "ID_3",
+    startingSemester: "SEMESTER_3",
+    career: "CAREER_3",
+    email: "EMAIL_3",
+    phoneNumber: "PHONE_NUMBER_3",
+    registrationTime: "2001-01-15"
   }
 ];
 
