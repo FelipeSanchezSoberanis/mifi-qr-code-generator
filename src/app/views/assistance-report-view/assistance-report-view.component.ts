@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { QrCodeData } from "../generate-qr-code-view/generate-qr-code-view.component";
 import { ActivatedRoute, Router } from "@angular/router";
 import { filter } from "rxjs";
+import * as Papaparse from "papaparse";
 
 export type StudentRegistration = QrCodeData & { registrationTime: string };
 export type AssistanceRecord = { [key: string]: boolean };
@@ -60,6 +61,31 @@ export class AssistanceReportViewComponent {
         this.sessions.updateValueAndValidity();
       });
   }
+
+  handleRegistrationFilesUploaded = async (event: Event) => {
+    const studentRegistrations: StudentRegistration[] = [];
+    const input = event.target as HTMLInputElement;
+    const csvFiles = Array.from(input.files || []);
+    await this.readStudentRegistrationsFromFiles(csvFiles, studentRegistrations);
+    const sessions = (this.sessions.value as string[]).map((s) => DateTime.fromISO(s));
+    const assistanceReport = this.generateAssistanceReport(sessions, studentRegistrations);
+    console.log(assistanceReport);
+  };
+
+  private readStudentRegistrationsFromFiles = (
+    csvFiles: File[],
+    studentRegistrations: StudentRegistration[]
+  ) => {
+    return new Promise((res) => {
+      csvFiles.forEach(async (file, i) => {
+        const text = await file.text();
+        const result = Papaparse.parse(text, { header: true, skipEmptyLines: "greedy" });
+        const data = result.data as StudentRegistration[];
+        studentRegistrations.push(...data);
+        if (i === csvFiles.length - 1) return res(undefined);
+      });
+    });
+  };
 
   generateAssistanceReport = (
     sessions: DateTime[],
