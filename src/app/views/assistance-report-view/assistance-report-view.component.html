@@ -9,7 +9,12 @@
       <label class="col-form-label">Sesión</label>
     </div>
     <div class="col-auto">
-      <input [formControl]="session" class="form-control" type="date" />
+      <input
+        (change)="handleSessionChanged()"
+        [formControl]="session"
+        class="form-control"
+        type="date"
+      />
     </div>
     <div class="col-auto">
       <button (click)="deleteSession(i)" class="btn btn-danger">x</button>
