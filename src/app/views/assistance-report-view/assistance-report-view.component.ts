@@ -24,6 +24,26 @@ export class AssistanceReportViewComponent {
   assistanceReport: AssistanceReport | null = null;
   studentRegistrations: StudentRegistration[] = [];
 
+  constructor() {
+    this.activatedRoute.queryParams
+      .pipe(
+        filter((queryParams): queryParams is { sessions: string } => {
+          return queryParams["sessions"] !== undefined;
+        })
+      )
+      .subscribe((queryParams) => {
+        const sessions = JSON.parse(queryParams.sessions) as string[];
+        this.sessions.clear();
+        sessions.forEach((s) => this.sessions.push(new FormControl(s, [Validators.required])));
+        this.sessions.updateValueAndValidity();
+      });
+
+    this.sessions.valueChanges.subscribe(() => {
+      this.assistanceReport = null;
+      this.studentRegistrations = [];
+    });
+  }
+
   getStudentNameFromEnrollmentId = (enrollmentId: string): string =>
     this.studentRegistrations.find((s) => s.enrollmentId === enrollmentId)!.name;
 
@@ -51,21 +71,6 @@ export class AssistanceReportViewComponent {
       relativeTo: this.activatedRoute
     });
   };
-
-  constructor() {
-    this.activatedRoute.queryParams
-      .pipe(
-        filter((queryParams): queryParams is { sessions: string } => {
-          return queryParams["sessions"] !== undefined;
-        })
-      )
-      .subscribe((queryParams) => {
-        const sessions = JSON.parse(queryParams.sessions) as string[];
-        this.sessions.clear();
-        sessions.forEach((s) => this.sessions.push(new FormControl(s, [Validators.required])));
-        this.sessions.updateValueAndValidity();
-      });
-  }
 
   handleRegistrationFilesUploaded = async (event: Event) => {
     const input = event.target as HTMLInputElement;
