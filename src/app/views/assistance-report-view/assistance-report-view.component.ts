@@ -1,5 +1,5 @@
 import { Component, inject } from "@angular/core";
-import { FormBuilder, FormControl, Validators } from "@angular/forms";
+import { FormArray, FormBuilder, FormControl, Validators } from "@angular/forms";
 import { DateTime } from "luxon";
 import { QrCodeData } from "../generate-qr-code-view/generate-qr-code-view.component";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -20,7 +20,12 @@ export class AssistanceReportViewComponent {
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
 
-  sessions = this.formBuilder.array([]);
+  sessions = this.formBuilder.array([]) as FormArray<FormControl<string | null>>;
+  assistanceReport: AssistanceReport | null = null;
+  studentRegistrations: StudentRegistration[] = [];
+
+  getStudentNameFromEnrollmentId = (enrollmentId: string): string =>
+    this.studentRegistrations.find((s) => s.enrollmentId === enrollmentId)!.name;
 
   addSession = () => {
     const sessions = this.sessions.value as string[];
@@ -65,10 +70,9 @@ export class AssistanceReportViewComponent {
   handleRegistrationFilesUploaded = async (event: Event) => {
     const input = event.target as HTMLInputElement;
     const csvFiles = Array.from(input.files || []);
-    const studentRegistrations = await this.getStudentRegistrationsFromCsvFiles(csvFiles);
+    this.studentRegistrations = await this.getStudentRegistrationsFromCsvFiles(csvFiles);
     const sessions = (this.sessions.value as string[]).map((s) => DateTime.fromISO(s));
-    const assistanceReport = this.generateAssistanceReport(sessions, studentRegistrations);
-    console.log(assistanceReport);
+    this.assistanceReport = this.generateAssistanceReport(sessions, this.studentRegistrations);
   };
 
   private getStudentRegistrationsFromCsvFiles = (
@@ -76,7 +80,6 @@ export class AssistanceReportViewComponent {
   ): Promise<StudentRegistration[]> => {
     return new Promise((res) => {
       const studentRegistrations: StudentRegistration[] = [];
-      const testingSpeed = new Set();
       csvFiles.forEach(async (file, i) => {
         const text = await file.text();
         const result = Papaparse.parse(text, { header: true, skipEmptyLines: "greedy" });

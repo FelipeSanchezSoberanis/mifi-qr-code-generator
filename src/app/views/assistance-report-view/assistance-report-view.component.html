@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div class="row justify-content-center">
+  <div class="row justify-content-center mb-3">
     <div class="col-auto">
       <input
         [disabled]="!sessions.valid || sessions.controls.length <= 0"
@@ -39,4 +39,29 @@
       />
     </div>
   </div>
+
+  <hr *ngIf="assistanceReport" />
+
+  <h2 class="text-center mb-3" *ngIf="assistanceReport">Reporte de asistencias</h2>
+
+  <table class="table table-striped" *ngIf="assistanceReport">
+    <thead>
+      <tr>
+        <th>Estudiante</th>
+        <th class="text-center" *ngFor="let session of sessions.value">{{ session }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let assistanceRecord of assistanceReport | keyvalue">
+        <td>{{ getStudentNameFromEnrollmentId(assistanceRecord.key) }}</td>
+        <td
+          *ngFor="let session of sessions.value"
+          class="text-center fw-bold"
+          [ngClass]="assistanceRecord.value[session!] ? 'text-success' : 'text-danger'"
+        >
+          {{ assistanceRecord.value[session!] ? "Sí" : "No" }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </main>
