@@ -40,28 +40,32 @@
     </div>
   </div>
 
-  <hr *ngIf="assistanceReport" />
+  <ng-container *ngIf="assistanceReportPerCareer">
+    <ng-container *ngFor="let assistanceReport of assistanceReportPerCareer | keyvalue">
+      <hr />
 
-  <h2 class="text-center mb-3" *ngIf="assistanceReport">Reporte de asistencias</h2>
+      <p class="fs-3 text-center mb-3">{{ assistanceReport.key }}</p>
 
-  <table class="table table-striped" *ngIf="assistanceReport">
-    <thead>
-      <tr>
-        <th>Estudiante</th>
-        <th class="text-center" *ngFor="let session of sessions.value">{{ session }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let assistanceRecord of assistanceReport | keyvalue">
-        <td>{{ getStudentNameFromEnrollmentId(assistanceRecord.key) }}</td>
-        <td
-          *ngFor="let session of sessions.value"
-          class="text-center fw-bold"
-          [ngClass]="assistanceRecord.value[session!] ? 'text-success' : 'text-danger'"
-        >
-          {{ assistanceRecord.value[session!] ? "Sí" : "No" }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th class="text-center" *ngFor="let session of sessions.value">{{ session }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of assistanceReport.value">
+            <td>{{ record.name }}</td>
+            <td
+              *ngFor="let session of sessions.value"
+              class="text-center fw-bold"
+              [ngClass]="record.assistanceRecord[session!] ? 'text-success' : 'text-danger'"
+            >
+              {{ record.assistanceRecord[session!] ? "Sí" : "No" }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </ng-container>
 </main>

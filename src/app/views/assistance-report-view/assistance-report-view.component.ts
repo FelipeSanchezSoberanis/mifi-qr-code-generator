@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { FormArray, FormBuilder, FormControl, Validators } from "@angular/forms";
 import { DateTime } from "luxon";
-import { QrCodeData } from "../generate-qr-code-view/generate-qr-code-view.component";
+import { QrCodeData, careers } from "../generate-qr-code-view/generate-qr-code-view.component";
 import { ActivatedRoute, Router } from "@angular/router";
 import { filter } from "rxjs";
 import * as Papaparse from "papaparse";
@@ -9,6 +9,9 @@ import * as Papaparse from "papaparse";
 export type StudentRegistration = QrCodeData & { registrationTime: string };
 export type AssistanceRecord = { [key: string]: boolean };
 export type AssistanceReport = { [key: string]: AssistanceRecord };
+export type AssistanceReportPerCareer = {
+  [key: string]: { name: string; enrollmentId: string; assistanceRecord: AssistanceRecord }[];
+};
 
 @Component({
   selector: "app-assistance-report-view",
@@ -21,8 +24,7 @@ export class AssistanceReportViewComponent {
   private router = inject(Router);
 
   sessions = this.formBuilder.array([]) as FormArray<FormControl<string | null>>;
-  assistanceReport: AssistanceReport | null = null;
-  studentRegistrations: StudentRegistration[] = [];
+  assistanceReportPerCareer: AssistanceReportPerCareer | null = null;
 
   constructor() {
     this.activatedRoute.queryParams
@@ -39,13 +41,9 @@ export class AssistanceReportViewComponent {
       });
 
     this.sessions.valueChanges.subscribe(() => {
-      this.assistanceReport = null;
-      this.studentRegistrations = [];
+      this.assistanceReportPerCareer = null;
     });
   }
-
-  getStudentNameFromEnrollmentId = (enrollmentId: string): string =>
-    this.studentRegistrations.find((s) => s.enrollmentId === enrollmentId)!.name;
 
   addSession = () => {
     const sessions = this.sessions.value as string[];
@@ -75,9 +73,26 @@ export class AssistanceReportViewComponent {
   handleRegistrationFilesUploaded = async (event: Event) => {
     const input = event.target as HTMLInputElement;
     const csvFiles = Array.from(input.files || []);
-    this.studentRegistrations = await this.getStudentRegistrationsFromCsvFiles(csvFiles);
+    const studentRegistrations = await this.getStudentRegistrationsFromCsvFiles(csvFiles);
     const sessions = (this.sessions.value as string[]).map((s) => DateTime.fromISO(s));
-    this.assistanceReport = this.generateAssistanceReport(sessions, this.studentRegistrations);
+    const assistanceReport = this.generateAssistanceReport(sessions, studentRegistrations);
+
+    this.assistanceReportPerCareer = {};
+    careers.forEach((career) => (this.assistanceReportPerCareer![career] = []));
+
+    for (let enrollmentId of Object.keys(assistanceReport)) {
+      const assistanceRecord = assistanceReport[enrollmentId];
+      const { career, name } = studentRegistrations.find((r) => r.enrollmentId === enrollmentId)!;
+      this.assistanceReportPerCareer[career.toString()].push({
+        name,
+        enrollmentId,
+        assistanceRecord
+      });
+    }
+
+    careers.forEach((career) =>
+      this.assistanceReportPerCareer![career].sort((a, b) => a.name.localeCompare(b.name))
+    );
   };
 
   private getStudentRegistrationsFromCsvFiles = (

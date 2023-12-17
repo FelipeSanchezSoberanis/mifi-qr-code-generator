@@ -6,11 +6,19 @@ import { filter, mergeMap } from "rxjs";
 import { TeamsService, TeamsUserInfo } from "src/app/api/teams.service";
 import Swal from "sweetalert2";
 
+export const careers = [
+  "Ingeniería civil",
+  "Ingeniería en energías renovables",
+  "Ingeniería física",
+  "Ingeniería mecatrónica"
+] as const;
+export type Career = typeof careers;
+
 export type QrCodeData = {
   name: string;
   enrollmentId: string;
   startingSemester: string;
-  career: string;
+  career: Career;
   email: string;
   phoneNumber: string;
 };
@@ -35,7 +43,7 @@ export class GenerateQrCodeViewComponent {
     name: ["", Validators.required],
     enrollmentId: ["", [Validators.required, Validators.pattern(/\d{8}/)]],
     startingSemester: ["", Validators.required],
-    career: ["", [Validators.required]],
+    career: [null as Career | null, [Validators.required]],
     email: ["", [Validators.required, Validators.email]],
     phoneNumber: ["", [Validators.pattern(/\d{10}/)]]
   });
