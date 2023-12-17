@@ -63,26 +63,26 @@ export class AssistanceReportViewComponent {
   }
 
   handleRegistrationFilesUploaded = async (event: Event) => {
-    const studentRegistrations: StudentRegistration[] = [];
     const input = event.target as HTMLInputElement;
     const csvFiles = Array.from(input.files || []);
-    await this.readStudentRegistrationsFromFiles(csvFiles, studentRegistrations);
+    const studentRegistrations = await this.getStudentRegistrationsFromCsvFiles(csvFiles);
     const sessions = (this.sessions.value as string[]).map((s) => DateTime.fromISO(s));
     const assistanceReport = this.generateAssistanceReport(sessions, studentRegistrations);
     console.log(assistanceReport);
   };
 
-  private readStudentRegistrationsFromFiles = (
-    csvFiles: File[],
-    studentRegistrations: StudentRegistration[]
-  ) => {
+  private getStudentRegistrationsFromCsvFiles = (
+    csvFiles: File[]
+  ): Promise<StudentRegistration[]> => {
     return new Promise((res) => {
+      const studentRegistrations: StudentRegistration[] = [];
+      const testingSpeed = new Set();
       csvFiles.forEach(async (file, i) => {
         const text = await file.text();
         const result = Papaparse.parse(text, { header: true, skipEmptyLines: "greedy" });
         const data = result.data as StudentRegistration[];
         studentRegistrations.push(...data);
-        if (i === csvFiles.length - 1) return res(undefined);
+        if (i === csvFiles.length - 1) return res(studentRegistrations);
       });
     });
   };
