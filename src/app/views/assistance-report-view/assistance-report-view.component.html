@@ -1,0 +1,79 @@
+<main class="container">
+  <h1 class="text-center mb-3">Generar reporte de asistencias</h1>
+
+  <div
+    *ngFor="let session of sessions.controls; index as i"
+    class="row justify-content-center mb-3"
+  >
+    <div class="col-auto">
+      <label class="col-form-label">Sesión {{ i + 1 }}</label>
+    </div>
+    <div class="col-auto">
+      <input
+        (change)="handleSessionChanged()"
+        [formControl]="session"
+        class="form-control"
+        type="date"
+      />
+    </div>
+    <div class="col-auto">
+      <button (click)="deleteSession(i)" class="btn btn-danger">x</button>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mb-3">
+    <div class="col-auto">
+      <button (click)="addSession()" class="btn btn-primary">Agregar sesión</button>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mb-3">
+    <div class="col-auto">
+      <input
+        [disabled]="!sessions.valid || sessions.controls.length <= 0"
+        class="form-control"
+        type="file"
+        accept=".csv"
+        multiple
+        (change)="handleRegistrationFilesUploaded($event)"
+      />
+    </div>
+  </div>
+
+  <ng-container *ngIf="assistanceReportPerCareer">
+    <ng-container *ngFor="let assistanceReport of assistanceReportPerCareer | keyvalue">
+      <hr />
+
+      <p style="position: sticky; top: 0; height: 42px" class="fs-3 text-center mb-3 bg-white">
+        {{ assistanceReport.key }}
+      </p>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th style="position: sticky; top: 42px">Nombre</th>
+            <th
+              style="position: sticky; top: 42px"
+              class="text-center"
+              *ngFor="let session of sessions.value"
+            >
+              {{ session }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of assistanceReport.value">
+            <td>{{ record.name }}</td>
+            <td
+              *ngFor="let session of sessions.value"
+              class="text-center fw-bold"
+              [ngClass]="record.assistanceRecord[session!] ? 'text-success' : 'text-danger'"
+            >
+              {{ record.assistanceRecord[session!] ? "Sí" : "No" }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </ng-container>
+</main>
