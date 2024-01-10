@@ -44,6 +44,7 @@ export class TeamsService {
     authorizationUrl.searchParams.set("redirect_uri", this.redirectUri);
     authorizationUrl.searchParams.set("response_type", "code");
     authorizationUrl.searchParams.set("scope", "User.Read");
+    authorizationUrl.searchParams.set("prompt", "select_account");
     return { codeVerifier, authorizationUrl };
   }
 
