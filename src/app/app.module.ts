@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { inject, NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
 import { AppRoutingModule } from "./app-routing.module";
@@ -11,6 +11,14 @@ import { JoinCsvsViewComponent } from "./views/join-csvs-view/join-csvs-view.com
 import { HomeViewComponent } from "./views/home-view/home-view.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { AssistanceReportViewComponent } from "./views/assistance-report-view/assistance-report-view.component";
+import { EventType, NavigationEnd, Router } from "@angular/router";
+import { filter } from "rxjs";
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
 
 @NgModule({
   declarations: [
@@ -26,4 +34,12 @@ import { AssistanceReportViewComponent } from "./views/assistance-report-view/as
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  private router = inject(Router);
+
+  constructor() {
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e.type === EventType.NavigationEnd))
+      .subscribe((e) => window.dataLayer.push({ event: "navigation", to: e.url }));
+  }
+}

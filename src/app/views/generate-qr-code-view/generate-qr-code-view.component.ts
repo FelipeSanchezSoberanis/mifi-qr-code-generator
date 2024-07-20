@@ -163,7 +163,10 @@ export class GenerateQrCodeViewComponent {
       showDenyButton: true,
       denyButtonText: "Corregir información"
     }).then((result) => {
-      if (result.isConfirmed) this.qrCodeDataString = JSON.stringify(qrCodeDataValuesOrderedByKeys);
+      if (result.isConfirmed) {
+        window.dataLayer.push({ event: "click", target: "generate qr code confirmation" });
+        this.qrCodeDataString = JSON.stringify(qrCodeDataValuesOrderedByKeys);
+      }
     });
   }
 
