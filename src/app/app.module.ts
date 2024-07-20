@@ -11,8 +11,6 @@ import { JoinCsvsViewComponent } from "./views/join-csvs-view/join-csvs-view.com
 import { HomeViewComponent } from "./views/home-view/home-view.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { AssistanceReportViewComponent } from "./views/assistance-report-view/assistance-report-view.component";
-import { EventType, NavigationEnd, Router } from "@angular/router";
-import { filter } from "rxjs";
 
 declare global {
   interface Window {
@@ -34,12 +32,4 @@ declare global {
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-  private router = inject(Router);
-
-  constructor() {
-    this.router.events
-      .pipe(filter((e): e is NavigationEnd => e.type === EventType.NavigationEnd))
-      .subscribe((e) => window.dataLayer.push({ event: "navigation", to: e.url }));
-  }
-}
+export class AppModule {}
