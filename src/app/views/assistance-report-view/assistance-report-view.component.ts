@@ -93,6 +93,12 @@ export class AssistanceReportViewComponent {
     careers.forEach((career) =>
       this.assistanceReportPerCareer![career].sort((a, b) => a.name.localeCompare(b.name))
     );
+
+    const nonEmptyAssistanceReportsPerCareer = Object.entries(
+      this.assistanceReportPerCareer
+    ).filter(([_, value]) => value.length > 0);
+
+    this.assistanceReportPerCareer = Object.fromEntries(nonEmptyAssistanceReportsPerCareer);
   };
 
   private getStudentRegistrationsFromCsvFiles = (
